@@ -16,8 +16,6 @@ export class Excel{
       row = row.slice(0, -1);
       //append Label row with line break
       CSV += row + '\r\n';
-
-      console.log(CSV)
     }
     //1st loop is to extract each row
     for (var i = 0; i < arrData.Row.length; i++) {
@@ -33,7 +31,6 @@ export class Excel{
  
     }
 
-    console.log(CSV)
 
     if (CSV == '') {
       alert("Invalid data");
