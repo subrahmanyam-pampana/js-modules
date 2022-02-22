@@ -1,5 +1,4 @@
 export class Excel{
-
   exportToCsv(JSONData, FileTitle, ShowLabel) {
     //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
     var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
@@ -31,7 +30,6 @@ export class Excel{
  
     }
 
-
     if (CSV == '') {
       alert("Invalid data");
       return;
@@ -57,6 +55,101 @@ export class Excel{
       }
     }
   } 
+  
+ createWorkSheet(name, sheet_idx, data) {
+  let work_sheet = `<Worksheet ss:Name="${name}">
+    <Table ss:DefaultRowHeight="14.5">`;
+
+  let body = "";
+
+  data.forEach((row, idx) => {
+    body += `<Row ss:AutoFitHeight="0">`;
+    if (idx == 0) {
+      row.forEach((cell, cell_idx) => {
+        body += `<Cell ss:StyleID="border-color">
+          <Data ss:Type="String">${cell}</Data></Cell>`;
+      });
+    } else {
+      row.forEach((cell) => {
+        body += `<Cell ss:StyleID="border"><Data ss:Type="String">${cell}</Data></Cell>`;
+      });
+    }
+
+    body += "</Row>";
+  });
+
+  work_sheet += body + `</Table></Worksheet>`;
+  return work_sheet;
+}
+
+ createWorkBook(data) {
+  let root = `<?xml version="1.0"?>
+  <?mso-application progid="Excel.Sheet"?>`;
+
+  let work_book = `
+  <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+   xmlns:o="urn:schemas-microsoft-com:office:office"
+   xmlns:x="urn:schemas-microsoft-com:office:excel"
+   xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882"
+   xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+   xmlns:html="http://www.w3.org/TR/REC-html40">`;
+
+  let styles = `<Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="border-color">
+    <Borders>
+      <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+      <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+      <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+      <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+    </Borders>
+    <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#FFFFFF"/>
+    <Interior ss:Color="#70AD47" ss:Pattern="Solid"/>
+    <NumberFormat/>
+  </Style>
+  <Style ss:ID="border">
+  <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+  </Borders>
+</Style>
+ </Styles>`;
+  work_book += styles;
+
+  data.forEach((worksheet, idx) => {
+    work_book += this.createWorkSheet(worksheet.name, idx + 1, worksheet.data);
+  });
+
+  work_book += `</Workbook>`;
+  root += work_book;
+  return root;
+}
+
+ downloadfile(fileString, filename) {
+  var blob = new Blob([fileString], {
+    type: "text/xml;charset=utf-8;",
+  });
+  var link = document.createElement("a");
+  if (link.download !== undefined) {
+    var url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.style = "visibility:hidden";
+    link.download = filename + ".xml";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+  
 }
 
 
