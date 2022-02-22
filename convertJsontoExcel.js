@@ -56,7 +56,8 @@
     }
   }
 
-  function export2Xml(data, fileName) {
+  function export2Xml(JSONData, fileName) {
+   var data = typeof JSONData != "object" ? JSON.parse(JSONData) : JSONData;
     let root = `<?xml version="1.0"?>
     <?mso-application progid="Excel.Sheet"?>`;
 
